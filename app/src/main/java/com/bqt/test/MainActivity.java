@@ -21,6 +21,7 @@ public class MainActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		
 		Bundle metaData = getMetaData(this);
+		Object baiduMapKey = metaData.get("baiduMapKey");
 		String[] array = {
 				"Flavor：" + BuildConfig.FLAVOR,
 				"applicationId：" + BuildConfig.APPLICATION_ID,
@@ -28,13 +29,15 @@ public class MainActivity extends ListActivity {
 				"versionCode：" + BuildConfig.VERSION_CODE,
 				"buildType：" + BuildConfig.BUILD_TYPE,
 				"debuggable：" + BuildConfig.DEBUG,
-				"Fields from product flavor.\nisHongkongUser：" + BuildConfig.isHongkongUser,
-				"Fields from product flavor.\ncountryCode：" + BuildConfig.countryCode,
-				"Fields from build type.\nBASE_URL：" + BuildConfig.BASE_URL,
-				"打包时间：" + metaData.getString("releaseTime"),
-				"渠道名称：" + metaData.getString("chanel"),
-				"百度地图的KEY：" + metaData.get("baiduMapKey") + "  " + metaData.get("baiduMapKey").getClass().getSimpleName(),
-				"签名：" + getAppSignatureSHA1(this),
+				"",
+				"Fields from product flavor.\n是否是香港用户：" + BuildConfig.isHongkongUser,
+				"Fields from product flavor.\n国家代码：" + BuildConfig.countryCode,
+				"Fields from build type.\n域名：" + BuildConfig.BASE_URL,
+				"",
+				"Fields from metaData.\n打包时间：" + metaData.getString("releaseTime"),
+				"Fields from metaData.\n渠道名称：" + metaData.getString("chanel"),
+				"Fields from metaData.\n百度地图密钥：" + baiduMapKey + "  类型：" + baiduMapKey.getClass().getSimpleName(),
+				"Fields from metaData.\n应用SHA1签名：" + getAppSignatureSHA1(this),
 		};
 		setListAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(Arrays.asList(array))));
 	}

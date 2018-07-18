@@ -21,7 +21,8 @@ android {
             targetCompatibility JavaVersion.VERSION_1_8
         }
 
-        // 放在这里可以在任何地方获取到，key可以不必用引号括起来，但注意字符串类型的值一般必须使用【'"】和【"'】括起来才可以
+        // 放在这里可以在任何地方获取到。key可以不必用引号括起来，但是字符串类型的值必须使用【'"】和【"'】括起来才可以
+        // 否则，值最匹配什么类型就是什么类型。比如【"1"】和【"@drawable/icon"】是int类型，而【'"1"'】才代表字符串类型
         manifestPlaceholders = [release_time_value: new Date().format("yyyy-MM-dd HH:mm:ss E", TimeZone.getDefault())]
     }
 
@@ -54,23 +55,25 @@ android {
     buildTypes { // 用于区分正式包和debug包。默认正式签名时就会走release脚本，调试签名时会走debug脚本
         release {
             debuggable false //是否可调试。debug模式默认为true，release模式默认是false
-            minifyEnabled true //debug与release的默认值都为false，如果需要混淆需要手动配置为true
-            zipAlignEnabled true// 是否启用Zipalign优化，对齐app所有资源
+            zipAlignEnabled true// 是否启用Zipalign优化，对齐app所有资源。因为对齐处理发生在签名之后，所以启用时必须指定了签名信息
             shrinkResources true// 在构建时是否自动移除无用的资源以减小apk包的大小(包括图片,布局,菜单等，但不包括value资源文件)
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' //配置混淆文件路径
+
+            minifyEnabled true //是否启用混淆。debug与release的默认值都为false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' //配置混淆文件所在路径
             //前一部分代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明，后一个文件是自己的定义混淆文件
+            consumerProguardFiles 'consumer-proguard-rules.pro'
+
             signingConfig signingConfigs.beakeystore2 //使用自己配置的签名信息
 
-            manifestPlaceholders = [baidu_map_key_value: "20094"]  //放在这里可以在任何debug下获取到
-            buildConfigField "String", "BASE_URL", '"http://110.com/"'
+            manifestPlaceholders = [baidu_map_key_value: "20094"]  //注意，这里的值用双引号括起来并不代表其就是String类型
+            buildConfigField "String", "BASE_URL", '"http://110.com/"' //自定义属性，可以在 BuildConfig 中获取设置的值
         }
 
         debug {
             signingConfig signingConfigs.debug  //使用默认的 debug 签名，即使不配置，也是使用的此默认签名
 
-            manifestPlaceholders = [baidu_map_key_value: "10086"]  //注意，这里的值用双引号括起来并不代表其就是String类型；
-            // 而是：值最匹配什么类型就是什么类型，比如现在就是int类型，如果要使用的是String类型，必须在外面再加上单引号
-            buildConfigField "String", "BASE_URL", '"http://120.com/"'
+            manifestPlaceholders = [baidu_map_key_value: "10086"]  //注意，这里的值用双引号括起来并不代表其就是String类型
+            buildConfigField "String", "BASE_URL", '"http://120.com/"' //自定义属性，可以在 BuildConfig 中获取设置的值
         }
 
         pre.initWith(release) //initWith的作用是：拷贝指定构建类型 release 中的所有变量到 pre，然后gradle就会自动生成新的task
@@ -88,10 +91,10 @@ android {
 
             resValue "string", "app_icon_name", "产品A" //替换掉指定的资源文件，比如应用名
 
-            buildConfigField "boolean", "isHongkongUser", "true"//自定义属性，比如网络请求的 IP
-            buildConfigField "int", "countryCode", "20094"//自定义属性
+            buildConfigField "boolean", "isHongkongUser", "true"//自定义属性，可以在 BuildConfig 中获取设置的值
+            buildConfigField "int", "countryCode", "20094"//自定义属性，可以在 BuildConfig 中获取设置的值
 
-            manifestPlaceholders = [app_logo         : "@drawable/icon",//替换清单文件中的标签，比如应用logo，多渠道信息
+            manifestPlaceholders = [app_logo         : "@drawable/icon",//用于替换清单文件中的标签，比如应用logo，多渠道信息
                                     app_channel_value: "小米应用市场",
             ]
         }
@@ -102,10 +105,10 @@ android {
 
             resValue "string", "app_icon_name", "产品B" //替换掉指定的资源文件，比如应用名
 
-            buildConfigField "boolean", "isHongkongUser", "false"//自定义属性，比如网络请求的 IP
-            buildConfigField "int", "countryCode", "20095"//自定义属性
+            buildConfigField "boolean", "isHongkongUser", "false"//自定义属性，可以在 BuildConfig 中获取设置的值
+            buildConfigField "int", "countryCode", "20095"//自定义属性，可以在 BuildConfig 中获取设置的值
 
-            manifestPlaceholders = [app_logo         : "@drawable/icon2",//替换清单文件中的标签，比如应用logo，多渠道信息
+            manifestPlaceholders = [app_logo         : "@drawable/icon2",//用于替换清单文件中的标签，比如应用logo，多渠道信息
                                     app_channel_value: "应用宝",
             ]
         }
