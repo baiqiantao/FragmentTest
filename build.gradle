@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply from: "config/third_dependencies.gradle"
-apply from: "config/config.gradle"
+apply from: "config/config_dependencies.gradle"
+apply from: "config/config_android.gradle" //后面引用的 gradle 配置中的属性会覆盖掉前面引用的配置中的属性
 
 buildscript {
 

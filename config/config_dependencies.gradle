@@ -1,0 +1,16 @@
+//作用：对所依赖的系统版本、第三方库版本等进行统一的管理。
+// 注意：每一个此类型的文件必须包含一个根节点ext，且ext下必须包含一个属性android，除此之外可以随意定义其他属性或方法
+ext {
+    android = [] //因为后面引用的 gradle 配置中的属性会覆盖掉前面引用的配置中的属性，所以不应该在这里操作任何 android 属性的成员
+
+
+    version = [
+            support_v7: "27.1.1",
+            gson      : "2.6.2", // gson
+    ]
+
+    dependencies = [
+            "support_v7": "com.android.support:appcompat-v7:${version["support_v7"]}", // android  support v7 library
+            "gson"      : "com.google.code.gson:gson:${version["gson"]}", // gson
+    ]
+}
