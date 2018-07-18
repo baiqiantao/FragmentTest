@@ -29,6 +29,7 @@ public class MainActivity extends ListActivity {
 				"buildType：" + BuildConfig.BUILD_TYPE,
 				"debuggable：" + BuildConfig.DEBUG,
 				"Fields from product flavor.\nisHongkongUser：" + BuildConfig.isHongkongUser,
+				"Fields from product flavor.\ncountryCode：" + BuildConfig.countryCode,
 				"Fields from build type.\nBASE_URL：" + BuildConfig.BASE_URL,
 				"打包时间：" + metaData.getString("releaseTime"),
 				"渠道名称：" + metaData.getString("chanel"),

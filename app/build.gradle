@@ -1,0 +1,123 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.android["compileSdkVersion"]
+    buildToolsVersion rootProject.ext.android["buildToolsVersion"]
+
+    //*******************************************************************************************************************************
+    //                                                                                          【defaultConfig】
+    //*******************************************************************************************************************************
+    defaultConfig {
+        applicationId "com.bqt.test"
+        minSdkVersion rootProject.ext.android["minSdkVersion"]
+        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
+        versionName rootProject.ext.android["versionName"]
+        versionCode rootProject.ext.android["versionCode"]
+
+        flavorDimensions "bqt" //必须带上一个 flavorDimensions[维度、尺寸]，值可以随意
+        testInstrumentationRunner "android.support.com.bqt.test.runner.AndroidJUnitRunner"
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
+        // 放在这里可以在任何地方获取到，key可以不必用引号括起来，但注意字符串类型的值一般必须使用【'"】和【"'】括起来才可以
+        manifestPlaceholders = [release_time_value: new Date().format("yyyy-MM-dd HH:mm:ss E", TimeZone.getDefault())]
+    }
+
+    //*******************************************************************************************************************************
+    //                                                                                          【signingConfigs】
+    //*******************************************************************************************************************************
+    signingConfigs { //配置签名信息，例如各个不同产品的签名文件位置、密码、昵称、昵称密码等，要放在 buildTypes 上面配置
+        beakeystore { //除了默认的 debug 签名外，signingConfigs 中的其他签名必须完整的配置签名相关的信息
+            storeFile file('../config/bea.keystore')
+            storePassword 'beachinambk'
+            keyAlias 'bea.keystore'
+            keyPassword 'beachinambk'
+
+            v2SigningEnabled true
+        }
+
+        debug { //默认的 debug 签名，不需要指定签名信息
+            v2SigningEnabled true
+        }
+
+        beakeystore2.initWith(beakeystore)
+        beakeystore2 {
+            storeFile file('../config/bea2.keystore')
+        }
+    }
+
+    //*******************************************************************************************************************************
+    //                                                                                          【buildTypes】
+    //*******************************************************************************************************************************
+    buildTypes { // 用于区分正式包和debug包。默认正式签名时就会走release脚本，调试签名时会走debug脚本
+        release {
+            debuggable false //是否可调试。debug模式默认为true，release模式默认是false
+            minifyEnabled true //debug与release的默认值都为false，如果需要混淆需要手动配置为true
+            zipAlignEnabled true// 是否启用Zipalign优化，对齐app所有资源
+            shrinkResources true// 在构建时是否自动移除无用的资源以减小apk包的大小(包括图片,布局,菜单等，但不包括value资源文件)
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' //配置混淆文件路径
+            //前一部分代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明，后一个文件是自己的定义混淆文件
+            signingConfig signingConfigs.beakeystore2 //使用自己配置的签名信息
+
+            manifestPlaceholders = [baidu_map_key_value: "20094"]  //放在这里可以在任何debug下获取到
+            buildConfigField "String", "BASE_URL", '"http://110.com/"'
+        }
+
+        debug {
+            signingConfig signingConfigs.debug  //使用默认的 debug 签名，即使不配置，也是使用的此默认签名
+
+            manifestPlaceholders = [baidu_map_key_value: "10086"]  //注意，这里的值用双引号括起来并不代表其就是String类型；
+            // 而是：值最匹配什么类型就是什么类型，比如现在就是int类型，如果要使用的是String类型，必须在外面再加上单引号
+            buildConfigField "String", "BASE_URL", '"http://120.com/"'
+        }
+
+        pre.initWith(release) //initWith的作用是：拷贝指定构建类型 release 中的所有变量到 pre，然后gradle就会自动生成新的task
+        pre { //预发布版本，该版本除了下面指定的配置与release版本不同外，其他都与release相同
+            debuggable true
+        }
+    }
+
+    //*******************************************************************************************************************************
+    //                                                                                          【productFlavors】
+    //*******************************************************************************************************************************
+    productFlavors { //用于为不同的产品分配专有属性；构建基于同一份代码的不同Android项目有差异的部分；多渠道打包
+        productA {  //新建产品productA，在defaultConfig的基础上做修改
+            applicationId "com.bqt.test.productA"  // defaultConfig 中可以设置的这里基本也都可以设置
+
+            resValue "string", "app_icon_name", "产品A" //替换掉指定的资源文件，比如应用名
+
+            buildConfigField "boolean", "isHongkongUser", "true"//自定义属性，比如网络请求的 IP
+            buildConfigField "int", "countryCode", "20094"//自定义属性
+
+            manifestPlaceholders = [app_logo         : "@drawable/icon",//替换清单文件中的标签，比如应用logo，多渠道信息
+                                    app_channel_value: "小米应用市场",
+            ]
+        }
+
+        productB {  //新建产品productB
+            applicationIdSuffix ".productB" //在defaultConfig中默认applicationId的基础上在后面追加一段
+            versionNameSuffix "_productB" //在defaultConfig中默认versionName的基础上在后面追加一段
+
+            resValue "string", "app_icon_name", "产品B" //替换掉指定的资源文件，比如应用名
+
+            buildConfigField "boolean", "isHongkongUser", "false"//自定义属性，比如网络请求的 IP
+            buildConfigField "int", "countryCode", "20095"//自定义属性
+
+            manifestPlaceholders = [app_logo         : "@drawable/icon2",//替换清单文件中的标签，比如应用logo，多渠道信息
+                                    app_channel_value: "应用宝",
+            ]
+        }
+    }
+}
+
+//***********************************************************************************************************************************
+//                                                                                          【dependencies】
+//***********************************************************************************************************************************
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation rootProject.ext.dependencies["support_v7"] // android support library
+    implementation rootProject.ext.dependencies["gson"] // gson
+}
+
