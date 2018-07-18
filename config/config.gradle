@@ -1,0 +1,21 @@
+ext { //文件名字随便起，目的是对所依赖的系统版本、第三方库版本等进行统一管理
+
+    android = [compileSdkVersion       : 26,
+               buildToolsVersion       : "27.0.3",
+               minSdkVersion           : 14,
+               targetSdkVersion        : 22,
+               versionName             : "1.0.0",
+    ]
+
+    thirdLib = [
+            gsonVersion    : "2.6.2", // gson
+            eventbusVersion: "3.0.0", // 事件分发
+    ]
+
+    dependencies = [
+            //android lib
+            "appcompat-v7": "com.android.support:appcompat-v7:${android["androidSupportSdkVersion"]}",
+            "annotations" : "com.android.support:support-annotations:${android["androidSupportSdkVersion"]}",
+            "cardview-v7" : "com.android.support:cardview-v7:${android["androidSupportSdkVersion"]}",
+    ]
+}
