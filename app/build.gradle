@@ -39,20 +39,20 @@ android {
             v2SigningEnabled true
         }
 
-        debug { //默认的 debug 签名，不需要指定签名信息
+        debug { //默认的 debug 签名，不需要指定签名信息，当然你也可以专门生成并配置一个 debug 签名
             v2SigningEnabled true
         }
 
-        beakeystore2.initWith(beakeystore)
+        beakeystore2.initWith(beakeystore)  //initWith的作用是：拷贝指定签名 beakeystore 中的所有配置到新的签名中
         beakeystore2 {
-            storeFile file('../config/bea2.keystore')
+            storeFile file('../config/bea2.keystore') //除了签名文件不一样外，密码、昵称、昵称密码等和 beakeystore 完全一样
         }
     }
 
     //*******************************************************************************************************************************
     //                                                                                          【buildTypes】
     //*******************************************************************************************************************************
-    buildTypes { // 用于区分正式包和debug包。默认正式签名时就会走release脚本，调试签名时会走debug脚本
+    buildTypes { // 用于区分release包和debug等不同构建类型的包。默认正式签名时会走release脚本，调试签名时会走debug脚本
         release {
             debuggable false //是否可调试。debug模式默认为true，release模式默认是false
             zipAlignEnabled true// 是否启用Zipalign优化，对齐app所有资源。因为对齐处理发生在签名之后，所以启用时必须指定了签名信息
@@ -63,7 +63,7 @@ android {
             //前一部分代表系统默认的android程序的混淆文件，该文件已经包含了基本的混淆声明，后一个文件是自己的定义混淆文件
             consumerProguardFiles 'consumer-proguard-rules.pro'
 
-            signingConfig signingConfigs.beakeystore2 //使用自己配置的签名信息
+            signingConfig signingConfigs.beakeystore //使用自己配置的签名信息
 
             manifestPlaceholders = [baidu_map_key_value: "20094"]  //注意，这里的值用双引号括起来并不代表其就是String类型
             buildConfigField "String", "BASE_URL", '"http://110.com/"' //自定义属性，可以在 BuildConfig 中获取设置的值
@@ -87,7 +87,7 @@ android {
     //*******************************************************************************************************************************
     productFlavors { //用于为不同的产品分配专有属性；构建基于同一份代码的不同Android项目有差异的部分；多渠道打包
         productA {  //新建产品productA，在defaultConfig的基础上做修改
-            applicationId "com.bqt.test.productA"  // defaultConfig 中可以设置的这里基本也都可以设置
+            applicationId "com.bqt.test.productA"  // defaultConfig 中可以设置的属性在这里基本也都可以设置
 
             resValue "string", "app_icon_name", "产品A" //替换掉指定的资源文件，比如应用名
             resValue "color", "color_footer", "#ffff0000" //替换掉的资源可以是没有定义过的
@@ -115,13 +115,13 @@ android {
             ]
         }
 
-        // 批量处理所有的productFlavors，常用于多渠道打包时的统一配置
+        // 批量处理所有的 productFlavors，常用于多渠道打包时的统一配置渠道名等信息
         productFlavors.all {
-            //注意，下面这种方式会覆盖掉上面每个产品单独配置的 manifestPlaceholders ，所以要保证上面配置的所有标签都要有才行
+            //注意，这里配置后会覆盖掉上面每个Flavor已配置的 manifestPlaceholders ，所以设置时要保证上面配置的所有标签都要有才行
             //flavor -> flavor.manifestPlaceholders = [app_logo: "@drawable/icon2", app_channel_value: name + " 首发"]
         }
 
-        //自定义所有生产的APK包的位置与名称
+        //自定义所有输出的APK包的位置与名称，多渠道打包时也非常有用，如果不设置，每个Flavor构建的APK都会
         android.applicationVariants.all { variant ->
             def sep = "_"  //分隔符
             def time = releaseTime()  //打包时间
@@ -130,14 +130,15 @@ android {
             variant.outputs.all { output ->
                 variant.productFlavors.each { flavor ->
                     def applicationId = flavor.applicationId == null ? defaultConfig.applicationId : flavor.applicationId // flavor没配置时为空
-                    def productName = flavor.name //应用名
+                    def flavorName = flavor.name //应用名
+                    def channelName = flavor.manifestPlaceholders["app_channel_value"] //渠道名
 
                     if (buildType == "release") { //变更输出路径。变更后会导致通过Run方式构建的Apk无法自动安装
                         def apkPath = project.rootDir.absolutePath + "/apks/${applicationId}/" //可以通过占位符【${}】或【+】来拼接字符串
                         variant.getPackageApplication().outputDirectory = new File(apkPath)
                     }
-                    def apkName = productName + sep + buildType + sep + "v" + versionCode + sep + time + ".apk"
-                    println "【文件名】" + apkName //例如【productB_release_v15_20180719_19.59.43_星期四.apk】
+                    def apkName = flavorName + sep + buildType + sep + channelName + sep + "v" + versionCode + sep + time + ".apk"
+                    println "【文件名】" + apkName //例如【productB_release_应用宝_v16_20180719_21.18.15_星期四.apk】
                     output.outputFileName = apkName  //重新对apk命名
                     //注意，Gradle4.0以下版本对apk重命名的方式为：variant.outputFile = new File(variant.outputFile.parent, apkName)
                 }

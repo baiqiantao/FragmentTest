@@ -1,5 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-apply from: "config/config_dependencies.gradle"
+apply from: "config/config_dependencies.gradle" //目的是将所依赖的系统版本、第三方库版本等抽到专门的文件中进行统一的管理
 apply from: "config/config_android.gradle" //后面引用的 gradle 配置中的属性会覆盖掉前面引用的配置中的属性
 
 buildscript {
