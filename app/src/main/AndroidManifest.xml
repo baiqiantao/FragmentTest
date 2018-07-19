@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.bqt.test">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-
     <application
         android:icon="${app_logo}"
         android:label="@string/app_icon_name"

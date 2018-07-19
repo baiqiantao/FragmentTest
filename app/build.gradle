@@ -90,6 +90,7 @@ android {
             applicationId "com.bqt.test.productA"  // defaultConfig 中可以设置的这里基本也都可以设置
 
             resValue "string", "app_icon_name", "产品A" //替换掉指定的资源文件，比如应用名
+            resValue "color", "color_footer", "#ffff0000" //替换掉的资源可以是没有定义过的
 
             buildConfigField "boolean", "isHongkongUser", "true"//自定义属性，可以在 BuildConfig 中获取设置的值
             buildConfigField "int", "countryCode", "20094"//自定义属性，可以在 BuildConfig 中获取设置的值
@@ -104,6 +105,7 @@ android {
             versionNameSuffix "_productB" //在defaultConfig中默认versionName的基础上在后面追加一段
 
             resValue "string", "app_icon_name", "产品B" //替换掉指定的资源文件，比如应用名
+            resValue "color", "color_footer", "#ff0000ff" //替换掉的资源可以是没有定义过的
 
             buildConfigField "boolean", "isHongkongUser", "false"//自定义属性，可以在 BuildConfig 中获取设置的值
             buildConfigField "int", "countryCode", "20095"//自定义属性，可以在 BuildConfig 中获取设置的值
