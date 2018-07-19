@@ -2,10 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.bqt.test">
 
+    <!--下面 icon 的值 ${app_logo} 和下面的 meta-data 一样，是在 app 的 build.gradle 中通过 manifestPlaceholders 定义的-->
+    <!--下面 label 的值 @string/app_icon_name 是在 app 的 build.gradle 中通过 resValue 定义的-->
     <application
+        android:allowBackup="false"
         android:icon="${app_logo}"
         android:label="@string/app_icon_name"
         android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
+
+        <!--下面 label 的值 @string/main_activity_label_name 是在各个产品目录(如productA)里面的 res/values/strings.xml 中定义的-->
         <activity
             android:name=".MainActivity"
             android:label="@string/main_activity_label_name"
@@ -17,8 +22,10 @@
             </intent-filter>
         </activity>
 
+        <!--下面这个 Activity 也不是在 main 目录里面定义的，也是各个产品目录(如productA)里面的 java/完整包名/... 中定义的-->
         <activity android:name=".SecondActivity"/>
 
+        <!--这些设置的值都可以在JAVA代码中通过 ApplicationInfo 获取到-->
         <meta-data
             android:name="chanel"
             android:value="${app_channel_value}"/>

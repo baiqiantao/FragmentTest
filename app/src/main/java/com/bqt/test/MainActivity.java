@@ -24,7 +24,6 @@ public class MainActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		
 		Bundle metaData = getMetaData(this);
-		Object baiduMapKey = metaData.get("baiduMapKey");
 		String[] array = {
 				"applicationId：" + BuildConfig.APPLICATION_ID + "\nApp的包名：" + getPackageName()
 						+ "\n类的限定类名：" + getLocalClassName() + "  \n类所在的包名：" + getClass().getPackage().getName(),
@@ -40,7 +39,7 @@ public class MainActivity extends ListActivity {
 				"",
 				"meta-data，打包时间：" + metaData.getString("releaseTime"),
 				"meta-data，渠道名称：" + metaData.getString("chanel"),
-				"meta-data，百度地图密钥：" + baiduMapKey + "  类型：" + baiduMapKey.getClass().getSimpleName(),
+				"meta-data，百度地图密钥：" + metaData.getInt("baiduMapKey"),//注意这里是 int 类型
 				"",
 				"resValue，应用名称：" + getResources().getString(R.string.app_icon_name),
 				"resValue，设置的颜色：" + Integer.toHexString(getResources().getColor(R.color.color_footer)),
@@ -48,6 +47,13 @@ public class MainActivity extends ListActivity {
 				"应用SHA1签名：" + getAppSignatureSHA1(this),
 		};
 		setListAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>(Arrays.asList(array))));
+	}
+	
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		//注意：这个 SecondActivity 不是在 main 目录里面定义的，也是各个产品目录(如productA)里面的 java/完整包名/... 中定义的
+		startActivity(new Intent(this, SecondActivity.class));
 	}
 	
 	public static Bundle getMetaData(Context mContext) {
@@ -107,10 +113,4 @@ public class MainActivity extends ListActivity {
 	}
 	
 	private static final char HEX_DIGITS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-	
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		startActivity(new Intent(this, SecondActivity.class));
-	}
 }
