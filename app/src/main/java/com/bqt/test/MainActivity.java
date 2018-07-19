@@ -59,7 +59,7 @@ public class MainActivity extends ListActivity {
 	public static Bundle getMetaData(Context mContext) {
 		try {
 			ApplicationInfo applicationInfo = mContext.getPackageManager().getApplicationInfo(mContext.getPackageName(), PackageManager.GET_META_DATA);
-			return applicationInfo.metaData;
+			return applicationInfo.metaData;//Additional meta-data associated with this component.
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
 			return new Bundle();
