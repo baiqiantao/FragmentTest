@@ -23,7 +23,7 @@ android {
 
         // 放在这里可以在任何地方获取到。key可以不必用引号括起来，但是字符串类型的值必须使用【'"】和【"'】括起来才可以
         // 否则，值最匹配什么类型就是什么类型。比如【"1"】和【"@drawable/icon"】是int类型，而【'"1"'】才代表字符串类型
-        manifestPlaceholders = [release_time_value: new Date().format("yyyy-MM-dd HH:mm:ss E", TimeZone.getDefault())]
+        manifestPlaceholders = [release_time_value: releaseTime()]
     }
 
     //*******************************************************************************************************************************
@@ -114,6 +114,35 @@ android {
                                     app_channel_value: "应用宝",
             ]
         }
+
+        // 批量处理所有的productFlavors，常用于多渠道打包时的统一配置
+        productFlavors.all {
+            //注意，下面这种方式会覆盖掉上面每个产品单独配置的 manifestPlaceholders ，所以要保证上面配置的所有标签都要有才行
+            //flavor -> flavor.manifestPlaceholders = [app_logo: "@drawable/icon2", app_channel_value: name + " 首发"]
+        }
+
+        //自定义所有生产的APK包的位置与名称
+        android.applicationVariants.all { variant ->
+            def sep = "_"  //分隔符
+            def time = releaseTime()  //打包时间
+            def buildType = variant.buildType.name  //构建类型，比如 release 或 debug
+            def versionCode = variant.versionCode  //版本号
+            variant.outputs.all { output ->
+                variant.productFlavors.each { flavor ->
+                    def applicationId = flavor.applicationId == null ? defaultConfig.applicationId : flavor.applicationId // flavor没配置时为空
+                    def productName = flavor.name //应用名
+
+                    if (buildType == "release") { //变更输出路径。变更后会导致通过Run方式构建的Apk无法自动安装
+                        def apkPath = project.rootDir.absolutePath + "/apks/${applicationId}/" //可以通过占位符【${}】或【+】来拼接字符串
+                        variant.getPackageApplication().outputDirectory = new File(apkPath)
+                    }
+                    def apkName = productName + sep + buildType + sep + "v" + versionCode + sep + time + ".apk"
+                    println "【文件名】" + apkName //例如【productB_release_v15_20180719_19.59.43_星期四.apk】
+                    output.outputFileName = apkName  //重新对apk命名
+                    //注意，Gradle4.0以下版本对apk重命名的方式为：variant.outputFile = new File(variant.outputFile.parent, apkName)
+                }
+            }
+        }
     }
 }
 
@@ -126,3 +155,6 @@ dependencies {
     implementation rootProject.ext.dependencies["gson"] // gson
 }
 
+static def releaseTime() {
+    return new Date().format("yyyyMMdd_HH.mm.ss_E", TimeZone.getDefault()) // 或 TimeZone.getTimeZone("GMT+08:00")
+}
